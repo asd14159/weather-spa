@@ -32,6 +32,7 @@ App Routerによるファイルベース構成により、UIとロジックの�
 -Open-Meteo API
 
 ## ディレクトリ構成
+```
  weather-spa/
   ├─app/
   │ ├─page.tsx #トップページ
@@ -53,7 +54,20 @@ App Routerによるファイルベース構成により、UIとロジックの�
   ├─next.config.ts
   ├─postcss.config.mjs
   └─README.md
+```
   
 
 ## 工夫点
+ ### コード設計
+  コンポーネントを以下のように分割し、それぞれの責務を明確化した。
+   -WeatherControls: 都市・期間・指標の選択UIを担当
+   -WeatherChart: チャート描画を担当
+   -LoadingView: データ取得中の表示を担当
+   -ErrorView: エラー発生時の表示と再読み込みを担当
+
+### データ取得
  -`useCallback`と`useEffect`を組み合わせて、都市や期間が変更されたときのみAPIを呼ぶ。これにより、再レンダリングや無駄なリクエストを防止。また、エラー時の再読み込みボタンは`useCallback`でメモ化した`useEffect`を再利用。
+
+ ### UXと表示の工夫
+  -ローディング中はスピナーを表示して、ユーザーに処理中であることを視覚的に提示。
+  -エラー発生時には再読み込みボタンを設置し、UXを高めた。
