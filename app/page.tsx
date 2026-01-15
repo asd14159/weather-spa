@@ -4,8 +4,6 @@ import { WeatherChart } from "@/components/WeatherChart";
 import { LoadingView } from "@/components/LoadingView";
 import { ErrorView } from "@/components/ErrorView";
 import { useWeather } from "./hooks/useWeather";
-import { ChartDataItem } from "./types/chart";
-
 
 export default function Page() {
     const {
@@ -24,13 +22,7 @@ export default function Page() {
         refetch,
     } = useWeather();
 
-    const chartData: ChartDataItem[] = data.map((value, index) => ({
-        time:
-        period === "48h"
-            ? `${index + 1}h`
-            : `${index + 1}日`,
-        value,
-    }));
+    const chartData = data;
 
     const legendName =
       period === "48h"

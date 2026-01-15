@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+##Weather SPA (tamble Cording Test)
 
-## Getting Started
+## 起動手順
+ ### 前提条件
+ -Node.js v18以上
+ -npm(Node.jsに同梱)
 
-First, run the development server:
+ ### セットアップ
+ ```bash
+ git clone https://github.com/asd14159/weather-spa.git
+ cd weather-spa
+ npm install
+ npm run dev
+ ```
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+ ### ブラウザで確認
+ http://localhost:3000
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 技術スタック
+-Next.js(App Rosuter)
+ルーティングやビルド設定が標準で整備されている。
+開発効率と実務での利用頻度を考慮し、Next.jsを採用。
+App Routerによるファイルベース構成により、UIとロジックの責務を分離。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+-TypeScript
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+-Recharts
+ Reactコンポーネントとして扱いやすい
+ Tooltipや軸フォーマット制御を容易に実装できる
+ TypeScriptと親和性が高い
 
-## Learn More
+-Open-Meteo API
 
-To learn more about Next.js, take a look at the following resources:
+## ディレクトリ構成
+ weather-spa/
+  ├─app/
+  │ ├─page.tsx #トップページ
+  │ ├─components/
+  │ │ ├─WeatherChart.tsx
+  │ │ ├─WeatherControls.tsx
+  │ │ ├─LoadingView.tsx
+  │ │ └─ErrorView.tsx
+  │ └─hooks/ #カスタムフック
+  │ └─useWeather.ts
+  ├─public/ #画像やSVGなどの静的ファイル
+  │ ├─globe.svg
+  │ └─next.svg
+  ├─types/ #TypeScriptの型定義
+  │ ├─chart.ts
+  │ └─weather.ts
+  ├─package.json
+  ├─tsconfig.json
+  ├─next.config.ts
+  ├─postcss.config.mjs
+  └─README.md
+  
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 工夫点
+ -`useCallback`と`useEffect`を組み合わせて、都市や期間が変更されたときのみAPIを呼ぶ。これにより、再レンダリングや無駄なリクエストを防止。また、エラー時の再読み込みボタンは`useCallback`でメモ化した`useEffect`を再利用。

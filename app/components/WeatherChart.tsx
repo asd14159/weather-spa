@@ -1,23 +1,30 @@
 "use client";
 import {
-    LineChart,
-    Line,
-    XAxis,
-    YAxis,
-    Tooltip,
-    CartesianGrid,
-    Legend,
-    ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+  Legend,
+  ResponsiveContainer,
 } from "recharts"
 
-import type { ChartDataItem } from "@/types/chart";
+import type { ChartDataItem } from "types/chart";
 
 type WeatherChartProps = {
-    title: string;
-    data: ChartDataItem[];
-    unit: string;
-    legendName: string;
+  title: string;
+  data: ChartDataItem[];
+  unit: string;
+  legendName: string;
 };
+function formatTimeLabel(v: unknown) {
+  if(typeof v !== "string") return "";
+  if(v.includes("T")) {
+    return `${v.slice(5,10)} ${v.slice(11,16)}`;
+  }
+  return v.slice(5);
+}
 
 export function WeatherChart({ title, data, unit, legendName }: WeatherChartProps) {
   return (
@@ -28,13 +35,17 @@ export function WeatherChart({ title, data, unit, legendName }: WeatherChartProp
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />
 
-          <XAxis dataKey="time" />
+          <XAxis 
+            dataKey="time"
+            tickFormatter={formatTimeLabel}
+          />
           <YAxis
             tickFormatter={(v) => `${v}${unit}`}
           />
 
           <Tooltip
             formatter={(value) => `${value}${unit}`}
+            labelFormatter={formatTimeLabel}
           />
 
           <Line

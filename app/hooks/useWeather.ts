@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
-import type { City, Period, HourlyMetric, DailyMetric, HourlyData, DailyData } from "@/types/weather";
+import type { City, Period, HourlyMetric, DailyMetric, HourlyData, DailyData } from "types/weather";
+import { ChartDataItem } from "types/chart";
 
 export function useWeather() {
   const [city, setCity] = useState<City>("東京");
@@ -63,21 +64,28 @@ export function useWeather() {
   },[fetchWeather]);
 
   //表示用データと単位を計算
-  const data: number[] = 
+  const data: ChartDataItem[] = 
     period === "48h" && hourlyData
-        ? (hourlyMetric === "temperature"
-            ? hourlyData.temperature_2m
+      ? hourlyData.time.slice(0,48).map((t,i) => ({
+        time: t,
+        value:
+          hourlyMetric === "temperature"
+            ? hourlyData.temperature_2m[i]
             : hourlyMetric === "apparent"
-                ? hourlyData?.apparent_temperature
-                : hourlyMetric === "rain"
-                    ? hourlyData.precipitation
-                    : hourlyData.wind_speed_10m
-        ).slice(0,48)
-        : period === "7d" && dailyData
-            ? dailyMetric === "temp_max"
-                ? dailyData?.temperature_2m_max
-                : dailyData.temperature_2m_min
-            : [];
+              ? hourlyData.apparent_temperature[i]
+              : hourlyMetric === "rain"
+                ? hourlyData.precipitation[i]
+                : hourlyData.wind_speed_10m[i],
+        }))
+      : period === "7d" && dailyData
+        ? dailyData.time.map((t,i) => ({
+          time: t,
+          value: 
+            dailyMetric === "temp_max"
+              ? dailyData.temperature_2m_max[i]
+              : dailyData.temperature_2m_min[i],
+        }))
+        : [];
 
   const unitMapHourly: Record<HourlyMetric, string> = {
     temperature: "℃",
