@@ -23,9 +23,13 @@
 App Routerによるファイルベース構成により、UIとロジックの責務を分離。
 - TypeScript
 - Recharts
- - Reactコンポーネントとして扱いやすい
- - Tooltipや軸フォーマット制御を容易に実装できる
- - TypeScriptと親和性が高い
+
+  Reactコンポーネントとして扱いやすい
+
+  Tooltipや軸フォーマット制御を容易に実装できる
+
+  TypeScriptと親和性が高い
+  
 - Open-Meteo API
 
 ## ディレクトリ構成

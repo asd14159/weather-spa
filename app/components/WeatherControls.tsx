@@ -3,7 +3,7 @@ import type {
     Period,
     HourlyMetric,
     DailyMetric,
-} from "@/types/weather"
+} from "types/weather"
 
 type Props = {
     city: City;
