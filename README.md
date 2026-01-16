@@ -16,6 +16,9 @@
  ### ブラウザで確認
  http://localhost:3000
 
+ ### デモ
+ https://weather-71bwmmdru-asd14159s-projects.vercel.app/
+
 ## 技術スタック
 - Next.js(App Rosuter)
 ルーティングやビルド設定が標準で整備されている。
@@ -29,7 +32,7 @@ App Routerによるファイルベース構成により、UIとロジックの�
   Tooltipや軸フォーマット制御を容易に実装できる
 
   TypeScriptと親和性が高い
-  
+
 - Open-Meteo API
 
 ## ディレクトリ構成
@@ -74,7 +77,7 @@ App Routerによるファイルベース構成により、UIとロジックの�
 
   - エラー発生時には再読み込みボタンを設置し、UXを高めた。
 
-  ### 既知の構成/注意事項
-   - Node.js18以上、npm同梱環境での動作
-   - 対応ブラウザはGoogle Chrome最新版
-   - 天気データはOpen-Meteo APIから取得
+## 既知の構成/注意事項
+  - Node.js18以上、npm同梱環境での動作
+  - 対応ブラウザはGoogle Chrome最新版
+  - 天気データはOpen-Meteo APIから取得
