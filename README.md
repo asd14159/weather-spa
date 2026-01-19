@@ -1,6 +1,6 @@
-#　Weather SPA (tamble Cording Test)
-都市・期間・指標を選択し、時系列の天気データを可視化するSPAです。
-Open-Metro APIを利用して天気情報を取得し、折れ線グラフとして表示します。
+##　Weather SPA (tamble Cording Test)
+ 都市・期間・指標を選択し、時系列の天気データを可視化するSPAです。
+ Open-Metro APIを利用して天気情報を取得し、折れ線グラフとして表示します。
 
 ## 起動手順
  ### 前提条件
@@ -23,14 +23,14 @@ Open-Metro APIを利用して天気情報を取得し、折れ線グラフとし
 
 ## 技術スタック
 - Next.js(App Rosuter)
- ルーティングやビルド設定が標準で整備されており、開発効率が高い
- 実務での利用頻度を考慮してNext.jsを採用
- App Routerによるファイルベース構成により、UIとロジックの責務を分離
+  -ルーティングやビルド設定が標準で整備されており、開発効率が高い
+  -実務での利用頻度を考慮してNext.jsを採用
+  -App Routerによるファイルベース構成により、UIとロジックの責務を分離
 - TypeScript
 - Recharts
-  Reactコンポーネントとして扱いやすい
-  Tooltipや軸フォーマット制御を容易に実装できる
-  TypeScriptと親和性が高い
+  -Reactコンポーネントとして扱いやすい
+  -Tooltipや軸フォーマット制御を容易に実装できる
+  -TypeScriptと親和性が高い
 - Open-Meteo API
 
 ## ディレクトリ構成
