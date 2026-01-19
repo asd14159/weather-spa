@@ -1,16 +1,28 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
-import type { City, Period, HourlyMetric, DailyMetric, HourlyData, DailyData } from "types/weather";
-import { ChartDataItem } from "types/chart";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import type { 
+  City, 
+  Period,
+  DailyMetric, 
+  HourlyData, 
+  DailyData,
+  HourlyMetricBase,
+  HourlyMetricDetail,
+ } from "types/weather";
+import { ChartType, ChartDataItem } from "types/chart";
 
 export function useWeather() {
   const [city, setCity] = useState<City>("東京");
   const [period, setPeriod] = useState<Period>("48h");
-  const [hourlyMetric, setHourlyMetric] = useState<HourlyMetric>("temperature");
-  const [dailyMetric, setDailyMetric] = useState<DailyMetric>("temp_max");
+
+  const [hourlyMetricBase, setHourlyMetricBase] = useState<HourlyMetricBase>("temperature");
+  const [hourlyMetricDetail, setHourlyMetricDetail] = useState<HourlyMetricDetail[]>(["temperature"]);
+
+  const [dailyMetric, setDailyMetric] = useState<DailyMetric[]>(["temp_max"]);
 
   const [hourlyData, setHourlyData] = useState<HourlyData | null>(null);
   const [dailyData, setDailyData] = useState<DailyData | null>(null);  
+
   const [loading,setLoading] = useState(false);
   const [error,setError] = useState<string | null>(null);
 
@@ -22,11 +34,44 @@ export function useWeather() {
     那覇: { lat: 26.2124, lon: 127.6809 }
   }
 
+  useEffect(() => {
+    if(period === "48h") {
+      setDailyMetric(["temp_max"]);
+    } else {
+      setHourlyMetricBase("temperature");
+      setHourlyMetricDetail(["temperature"]);
+    }
+  }, [period]);
+
+  const hourlyParams = useMemo(() => {
+    if(hourlyMetricBase === "temperature"){
+      return hourlyMetricDetail.map((m) =>
+        m === "temperature"
+          ? "temperature_2m"
+          : "apparent_temperature"
+      )
+      .join(",");
+    }
+  
+
+    if(hourlyMetricBase === "rain") {
+      return "precipitation";
+    }
+
+    if(hourlyMetricBase === "wind") {
+      return "wind_speed_10m";
+    }
+
+    return "";
+  }, [hourlyMetricBase, hourlyMetricDetail]);
+
   //callbackで関数のメモ化[city,priod]が変わったときだけ新しい関数を作る
   const fetchWeather = useCallback(async () => {
     setLoading(true);
     setError(null);
+
     const { lat, lon } = cities[city];
+
     const url =
         period === "48h"
             ? `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,apparent_temperature,precipitation,wind_speed_10m&timezone=auto`
@@ -57,66 +102,100 @@ export function useWeather() {
     } finally {
       setLoading(false);
     }
-  },[city,period]);
+  },[city,period, hourlyParams]);
 
   useEffect(() => {
     fetchWeather();
   },[fetchWeather]);
 
-  //表示用データと単位を計算
-  const data: ChartDataItem[] = 
-    period === "48h" && hourlyData
-      ? hourlyData.time.slice(0,48).map((t,i) => ({
-        time: t,
-        value:
-          hourlyMetric === "temperature"
-            ? hourlyData.temperature_2m[i]
-            : hourlyMetric === "apparent"
-              ? hourlyData.apparent_temperature[i]
-              : hourlyMetric === "rain"
-                ? hourlyData.precipitation[i]
-                : hourlyData.wind_speed_10m[i],
-        }))
-      : period === "7d" && dailyData
-        ? dailyData.time.map((t,i) => ({
-          time: t,
-          value: 
-            dailyMetric === "temp_max"
-              ? dailyData.temperature_2m_max[i]
-              : dailyData.temperature_2m_min[i],
-        }))
-        : [];
+  const chartType: ChartType =
+    period === "48h" &&
+    hourlyMetricBase === "temperature" &&
+    hourlyMetricDetail.length > 1
+      ? "temperature-multi"
+      : "single";
 
-  const unitMapHourly: Record<HourlyMetric, string> = {
-    temperature: "℃",
-    apparent: "℃",
-    rain: "mm",
-    wind: "m/s",
-  };
+   const data: ChartDataItem[] = useMemo(() => {
+    if (period === "48h" && hourlyData) {
+      return hourlyData.time.slice(0, 48).map((time, i) => {
+        const item: ChartDataItem = { time };
 
-  const unitMapDaily: Record<DailyMetric, string> = {
-    temp_max: "℃",
-    temp_min: "℃",
-  };
+        if (hourlyMetricBase === "temperature") {
+          if (hourlyMetricDetail.includes("temperature")) {
+            item.temperature = hourlyData.temperature_2m[i];
+          }
+          if (hourlyMetricDetail.includes("apparent")) {
+            item.apparent = hourlyData.apparent_temperature[i];
+          }
+        }
+
+        if (hourlyMetricBase === "rain") {
+          item.rain = hourlyData.precipitation[i];
+        }
+
+        if (hourlyMetricBase === "wind") {
+          item.wind = hourlyData.wind_speed_10m[i];
+        }
+
+        return item;
+      });
+    }
+
+    if (period === "7d" && dailyData) {
+      return dailyData.time.map((time, i) => {
+        const item: ChartDataItem = { time };
+
+        if (dailyMetric.includes("temp_max")) {
+          item.temp_max = dailyData.temperature_2m_max[i];
+        }
+        if (dailyMetric.includes("temp_min")) {
+          item.temp_min = dailyData.temperature_2m_min[i];
+        }
+
+        return item;
+      });
+    }
+
+    return [];
+  }, [
+    period,
+    hourlyData,
+    dailyData,
+    hourlyMetricBase,
+    hourlyMetricDetail,
+    dailyMetric,
+  ]);
 
   const unit =
     period === "48h"
-        ? unitMapHourly[hourlyMetric]
-        : unitMapDaily[dailyMetric];
+      ? hourlyMetricBase === "temperature"
+        ? "℃"
+        : hourlyMetricBase === "rain"
+          ? "mm"
+          : "m/s"
+      : "℃";
 
   return {
     city,
     setCity,
     period,
     setPeriod,
-    hourlyMetric,
-    setHourlyMetric,
+
+    hourlyMetricBase,
+    setHourlyMetricBase,
+    hourlyMetricDetail,
+    setHourlyMetricDetail,
+
     dailyMetric,
     setDailyMetric,
+
+    chartType,
     data,
     unit,
+
     loading,
     error,
+
     refetch: fetchWeather,
   };
 }
