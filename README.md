@@ -1,4 +1,4 @@
-## Weather SPA (tamble Cording Test)
+## Weather SPA 
  都市・期間・指標を選択し、時系列の天気データを可視化するSPAです。
  Open-Metro APIを利用して天気情報を取得し、折れ線グラフとして表示します。
 
